@@ -1,0 +1,2 @@
+“Tesseract” vs “Keras-OCR” vs “EasyOCR”
+https://thangasami.medium.com/tesseract-vs-keras-ocr-vs-easyocr-ec8500b9455b#:~:text=Sametime%2C%20Pytesseract%2C%20easyocr%2C%20%26,perform%20for%20different%20use%20cases.
