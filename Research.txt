@@ -1,2 +1,11 @@
 “Tesseract” vs “Keras-OCR” vs “EasyOCR”
 https://thangasami.medium.com/tesseract-vs-keras-ocr-vs-easyocr-ec8500b9455b#:~:text=Sametime%2C%20Pytesseract%2C%20easyocr%2C%20%26,perform%20for%20different%20use%20cases.
+
+Tesseract OCR with multiple languages
+https://www.quora.com/Can-Tesseract-OCR-work-with-multiple-languages
+
+Tesseract OCR on Identity documents
+https://tafelvooreen.medium.com/tesseract-ocr-on-identity-documents-f3abae0ab1fc
+
+Contour Detection
+https://chatgpt.com/c/6724add8-f768-800d-9ef5-0260d150c46c
