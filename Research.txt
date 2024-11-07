@@ -7,5 +7,8 @@ https://www.quora.com/Can-Tesseract-OCR-work-with-multiple-languages
 Tesseract OCR on Identity documents
 https://tafelvooreen.medium.com/tesseract-ocr-on-identity-documents-f3abae0ab1fc
 
+OpenCV Contour Documentation
+https://docs.opencv.org/4.x/d4/d73/tutorial_py_contours_begin.html
+
 Contour Detection
 https://chatgpt.com/c/6724add8-f768-800d-9ef5-0260d150c46c
