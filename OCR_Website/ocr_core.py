@@ -6,6 +6,10 @@ import math
 from typing import Tuple, Union
 import numpy as np
 from deskew import determine_skew
+import easyocr
+
+# Load the EasyOCR Reader
+reader = easyocr.Reader(['ne'], gpu=True)  # Specify the language(s). Use 'ne' for Nepali.
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 tessdata_dir_config = r'"C:\Program Files\Tesseract-OCR\tessdata" --psm 7 --oem 3'
@@ -64,27 +68,45 @@ def ocr(file):
     erode = cv2.erode(adaptive_thresh, kernel, iterations=1)
     kernel1 = cv2.getStructuringElement(cv2.MORPH_RECT, (18,5))  #(18,5) standard
     dilate = cv2.dilate(erode,kernel1, iterations=1)
-    # kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT, (9,5))
-    # opening = cv2.morphologyEx(dilate, cv2.MORPH_OPEN, kernel2, iterations=2)     #(9,5) & 3 iterations removes picture noise better
+    kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT, (9,5))
+    opening = cv2.morphologyEx(dilate, cv2.MORPH_OPEN, kernel2, iterations=1)     #(9,5) & 3 iterations removes picture noise better
 
     # config = "--psm 7 --oem 3"
     lang = "nep"
     result = []
 
     # Filter contours
-    cnts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
     cnts = sorted(cnts, key=lambda x: cv2.boundingRect(x)[0])
 
+    # for c in cnts:
+    #     area = cv2.contourArea(c)
+    #     x, y, w, h = cv2.boundingRect(c)
+    #     aspect_ratio = w / float(h)
+    #     if aspect_ratio > 1.5 and aspect_ratio < 12 and area > 500 and area < 15000:
+    #         roi = bbox[y:y+h, x:x+w]
+    #         cv2.rectangle(bbox,(x,y),(x+w,y+h),(36, 255, 12), 2)
+    #         text = pytesseract.image_to_string(roi, config=tessdata_dir_config, lang=lang)
+    #         text = [line.strip() for line in text.split("\n") if line.strip() and line != '\x0c']
+    #         for item in text:
+    #             result.append(item)
+    # return result
+    results = []
+
+    # Process Contours and Perform OCR with EasyOCR
     for c in cnts:
         area = cv2.contourArea(c)
         x, y, w, h = cv2.boundingRect(c)
         aspect_ratio = w / float(h)
-        if aspect_ratio > 1.5 and aspect_ratio < 12 and area > 500 and area < 15000:
-            roi = bbox[y:y+h, x:x+w]
-            cv2.rectangle(bbox,(x,y),(x+w,y+h),(36, 255, 12), 2)
-            text = pytesseract.image_to_string(roi, config=tessdata_dir_config, lang=lang)
-            text = [line.strip() for line in text.split("\n") if line.strip() and line != '\x0c']
-            for item in text:
-                result.append(item)
-    return result
+        if aspect_ratio > 2.5 and aspect_ratio < 12 and area > 500 and area < 15000:
+            roi = bbox[y:y + h, x:x + w]
+            cv2.rectangle(bbox, (x, y), (x + w, y + h), (36, 255, 12), 2)
+
+            # Use EasyOCR to extract text
+            ocr_results = reader.readtext(roi)
+            for detection in ocr_results:
+                text, confidence = detection[1], detection[2]
+                if confidence > 0.3:  # Filter low-confidence results
+                    results.append(text)
+    return results                
